@@ -424,10 +424,10 @@ try
     throw v:exception
   endtry
 
-  if !has_key(dict, 'dir')
+  if !s:present(dict, 'dir')
     let dict.dir = s:fzf_getcwd()
   endif
-  if has('win32unix') && has_key(dict, 'dir')
+  if has('win32unix') && s:present(dict, 'dir')
     let dict.dir = fnamemodify(dict.dir, ':p')
   endif
 
@@ -764,6 +764,13 @@ function! s:split(dict)
   endtry
 endfunction
 
+nnoremap <silent> <Plug>(fzf-insert) i
+nnoremap <silent> <Plug>(fzf-normal) <Nop>
+if exists(':tnoremap')
+  tnoremap <silent> <Plug>(fzf-insert) <C-\><C-n>i
+  tnoremap <silent> <Plug>(fzf-normal) <C-\><C-n>
+endif
+
 function! s:execute_term(dict, command, temps) abort
   let winrest = winrestcmd()
   let pbuf = bufnr('')
@@ -792,8 +799,6 @@ function! s:execute_term(dict, command, temps) abort
       call self.switch_back(1)
     else
       if bufnr('') == self.buf
-        " Exit terminal mode first (see neovim#13769)
-        call feedkeys("\<C-\>\<C-n>", 'n')
         " We use close instead of bd! since Vim does not close the split when
         " there's no other listed buffer (nvim +'set nobuflisted')
         close
@@ -818,6 +823,10 @@ function! s:execute_term(dict, command, temps) abort
     call s:pushd(self.dict)
     call s:callback(self.dict, lines)
     call self.switch_back(s:getpos() == self.ppos)
+
+    if &buftype == 'terminal'
+      call feedkeys(&filetype == 'fzf' ? "\<Plug>(fzf-insert)" : "\<Plug>(fzf-normal)")
+    endif
   endfunction
 
   try
