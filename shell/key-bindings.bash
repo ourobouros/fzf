@@ -8,8 +8,8 @@
 # - $FZF_CTRL_T_COMMAND
 # - $FZF_CTRL_T_OPTS
 # - $FZF_CTRL_R_OPTS
-# - $FZF_ALT_C_COMMAND
-# - $FZF_ALT_C_OPTS
+# - $FZF_CTRL_L_COMMAND
+# - $FZF_CTRL_L_OPTS
 
 # Key bindings
 # ------------
@@ -39,9 +39,9 @@ fzf-file-widget() {
 
 __fzf_cd__() {
   local cmd dir
-  cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
+  cmd="${FZF_CTRL_L_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
     -o -type d -print 2> /dev/null | cut -b3-"}"
-  dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m) && printf 'cd %q' "$dir"
+  dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_CTRL_L_OPTS" $(__fzfcmd) +m) && printf 'cd %q' "$dir"
 }
 
 __fzf_history__() {
@@ -88,9 +88,9 @@ else
   bind -m vi-insert -x '"\C-r": __fzf_history__'
 fi
 
-# ALT-C - cd into the selected directory
-bind -m emacs-standard '"\ec": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
-bind -m vi-command '"\ec": "\C-z\ec\C-z"'
-bind -m vi-insert '"\ec": "\C-z\ec\C-z"'
+# CTRL-l - cd into the selected directory
+bind -m emacs-standard '"\C-l": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
+bind -m vi-command '"\C-l": "\C-z\ec\C-z"'
+bind -m vi-insert '"\C-l": "\C-z\ec\C-z"'
 
 fi
